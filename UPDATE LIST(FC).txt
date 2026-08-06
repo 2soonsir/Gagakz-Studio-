@@ -1,0 +1,2314 @@
+# RHYTHM N DRIVE - Enhanced Edition
+Full implementation plan untuk menambah features baru tanpa mengubah logik sedia ada
+
+## Ringkasan Projek
+Web-based racing game dengan rhythm elements. Menambah 15+ kereta baru (termasuk kereta tempatan Malaysia), tutorial system, visual feedback, sound effects, loading indicators, weather system, achievement system, AI opponent, customization, difficulty settings, dan season pass.
+
+---
+
+## Core Features Tambahan
+
+### 1. Kereta Baru (15+ Models)
+**Kereta Tempatan Malaysia:**
+- PERODUA: Axia, Bezza, Aruz, Alza
+- PROTON: X50, X70, Persona, Iriz
+
+**Kereta Import:**
+- TOYOTA: Vios, Camry, Supra
+- HONDA: Civic, City, NSX
+- NISSAN: GTR, Skyline
+- BMW: M3, M5
+
+### 2. Tutorial System
+- Interactive step-by-step guide untuk pemain baru
+- Highlight controls dengan overlay
+- Practice mode dengan hints
+- Skip option untuk experienced players
+
+### 3. Visual Feedback Enhancement
+- Particle effects untuk nitro boost
+- Screen shake untuk collision
+- Speed lines saat high speed
+- Glow effects untuk power-ups
+- Coin collection animation yang lebih smooth
+- Damage indicators (car smoking effect)
+
+### 4. Sound Effects
+- Engine sound (rev up/down)
+- Collision impact sound
+- Nitro activation/deactivation sound
+- Item collection sound (coins, gems, health)
+- Level up sound
+- Menu click/hover sounds
+- Achievement unlock sound
+- Weather ambient sounds
+
+### 5. Loading Indicators
+- Animated loading screen dengan progress bar
+- Studio intro animation yang lebih smooth
+- Asset preloading dengan percentage display
+- Transition animations antara screens
+
+### 6. Weather System
+- 4 weather types: Sunny, Rainy, Foggy, Night
+- Visual effects (rain drops, fog overlay)
+- Gameplay impact (reduced visibility, slippery controls)
+- Weather-specific particle effects
+- Dynamic background changes
+
+### 7. Achievement System
+- 20+ achievements (distance milestones, collection, speed records)
+- Achievement popup notifications
+- Achievement gallery/showcase screen
+- Rewards untuk unlock achievements (diamonds, exclusive cars)
+- Progress tracking dengan percentages
+
+### 8. AI Opponent
+- 3 difficulty levels (Easy, Medium, Hard)
+- Smart pathfinding (lane switching)
+- Adaptive difficulty (rubber-banding)
+- AI collision detection
+- AI visual indicator (different color scheme)
+
+### 9. Customization System
+- Car color picker (10+ colors)
+- Decal/sticker options (stripes, flames, numbers)
+- Rim colors
+- Neon underglow effects
+- Save custom configurations
+- Preview before purchase
+
+### 10. Difficulty Settings
+- Easy: Slower obstacles, more health drops
+- Normal: Current balance
+- Hard: Faster obstacles, fewer power-ups
+- Expert: Minimal UI, high speed
+- Difficulty multiplier untuk rewards
+
+### 11. Season Pass System
+- 30-day season with 50 tier rewards
+- Free track dan Premium track
+- Daily/Weekly challenges
+- XP progression system
+- Exclusive seasonal cars dan customizations
+- Season history tracker
+
+---
+
+## Tech Stack
+- **Frontend:** Vanilla JavaScript (existing), HTML5, CSS3
+- **Audio:** Web Audio API + Howler.js (for better sound management)
+- **Storage:** LocalStorage (existing) + IndexedDB (for larger data like season pass)
+- **Animations:** CSS3 animations + JavaScript animation frames
+
+---
+
+## Implementation Structure
+
+### Phase 1: Foundation Enhancements
+**Files Modified:**
+- `script.js`: Add new car data, sound management system, achievement definitions
+- `style.css`: Add new car visuals, animation keyframes, weather overlays
+- `index.html`: Add new UI elements (tutorial, achievements, season pass screens)
+
+**New Features:**
+- 15+ new cars dengan full styling
+- Sound effect integration
+- Loading indicators
+- Visual feedback improvements
+
+### Phase 2: Gameplay Systems
+**Files Modified:**
+- `script.js`: Add AI opponent logic, weather system, difficulty settings
+- `style.css`: Weather visual effects, AI car styling
+- `index.html`: Weather UI, difficulty selector
+
+**New Features:**
+- AI opponent dengan 3 difficulty levels
+- Weather system dengan 4 types
+- Difficulty settings menu
+
+### Phase 3: Progression Systems
+**Files Modified:**
+- `script.js`: Achievement system, customization logic, season pass
+- `style.css`: Customization UI, achievement cards, season pass styling
+- `index.html`: Achievement screen, customization garage, season pass screen
+
+**New Features:**
+- Achievement system (20+ achievements)
+- Car customization system
+- Season pass dengan 50 tiers
+
+### Phase 4: Tutorial & Polish
+**Files Modified:**
+- `script.js`: Tutorial state machine, screen transitions
+- `style.css`: Tutorial overlay, tooltips, polish animations
+- `index.html`: Tutorial steps UI
+
+**New Features:**
+- Interactive tutorial system
+- All visual polish dan transitions
+- Final testing dan bug fixes
+
+---
+
+## Implementation Details
+
+### File: `script.js` - New Additions (Append to existing code)
+
+**1. New Car Data (Add to CARS object):**
+```javascript
+// Tambah dalam existing CARS object
+axia: { brand:'PERODUA', hp:3, speed:2.5, price:5000, currency:'money', song:'/music/battle_theme.mp3' },
+bezza: { brand:'PERODUA', hp:3, speed:2.8, price:8000, currency:'money', song:'/music/battle_theme.mp3' },
+aruz: { brand:'PERODUA', hp:4, speed:3.2, price:12000, currency:'money', song:'/music/battle_theme.mp3' },
+alza: { brand:'PERODUA', hp:4, speed:3, price:10000, currency:'money', song:'/music/battle_theme.mp3' },
+x50: { brand:'PROTON', hp:4, speed:3.8, price:18000, currency:'money', song:'/music/battle_theme.mp3' },
+x70: { brand:'PROTON', hp:4, speed:3.5, price:16000, currency:'money', song:'/music/battle_theme.mp3' },
+persona: { brand:'PROTON', hp:3, speed:3.3, price:12000, currency:'money', song:'/music/battle_theme.mp3' },
+iriz: { brand:'PROTON', hp:3, speed:3.4, price:11000, currency:'money', song:'/music/battle_theme.mp3' },
+vios: { brand:'TOYOTA', hp:4, speed:3.5, price:15000, currency:'money', song:'/music/battle_theme.mp3' },
+camry: { brand:'TOYOTA', hp:4, speed:4, price:25000, currency:'money', song:'/music/battle_theme.mp3' },
+supra: { brand:'TOYOTA', hp:5, speed:5.5, price:100, currency:'diamond', song:'/music/battle_theme.mp3' },
+civic: { brand:'HONDA', hp:4, speed:4, price:22000, currency:'money', song:'/music/battle_theme.mp3' },
+city: { brand:'HONDA', hp:3, speed:3.3, price:14000, currency:'money', song:'/music/battle_theme.mp3' },
+nsx: { brand:'HONDA', hp:5, speed:6, price:150, currency:'diamond', song:'/music/battle_theme.mp3' },
+gtr: { brand:'NISSAN', hp:5, speed:5.8, price:120, currency:'diamond', song:'/music/battle_theme.mp3' },
+skyline: { brand:'NISSAN', hp:5, speed:5, price:80, currency:'diamond', song:'/music/battle_theme.mp3' },
+m3: { brand:'BMW', hp:5, speed:5.2, price:90, currency:'diamond', song:'/music/battle_theme.mp3' },
+m5: { brand:'BMW', hp:5, speed:5.5, price:110, currency:'diamond', song:'/music/battle_theme.mp3' }
+```
+
+**2. Sound System:**
+```javascript
+// Sound library - add at top of script.js
+const SOUNDS = {
+  engine: new Audio('/sounds/engine.mp3'),
+  collision: new Audio('/sounds/collision.mp3'),
+  nitro_on: new Audio('/sounds/nitro_on.mp3'),
+  nitro_off: new Audio('/sounds/nitro_off.mp3'),
+  coin: new Audio('/sounds/coin.mp3'),
+  gem: new Audio('/sounds/gem.mp3'),
+  health: new Audio('/sounds/health.mp3'),
+  levelup: new Audio('/sounds/levelup.mp3'),
+  achievement: new Audio('/sounds/achievement.mp3'),
+  click: new Audio('/sounds/click.mp3'),
+  hover: new Audio('/sounds/hover.mp3'),
+  rain: new Audio('/sounds/rain.mp3'),
+  wind: new Audio('/sounds/wind.mp3')
+};
+
+// Sound play function
+function playSound(soundName, volume = 1) {
+  if (SOUNDS[soundName]) {
+    SOUNDS[soundName].volume = volume;
+    SOUNDS[soundName].currentTime = 0;
+    SOUNDS[soundName].play().catch(() => {});
+  }
+}
+```
+
+**3. Weather System:**
+```javascript
+// Weather configurations
+const WEATHER_TYPES = {
+  sunny: { name: 'Cerah', speedMult: 1, visibility: 1, bgClass: 'weather-sunny' },
+  rainy: { name: 'Hujan', speedMult: 0.85, visibility: 0.8, bgClass: 'weather-rainy' },
+  foggy: { name: 'Kabus', speedMult: 0.95, visibility: 0.6, bgClass: 'weather-foggy' },
+  night: { name: 'Malam', speedMult: 1, visibility: 0.9, bgClass: 'weather-night' }
+};
+
+let currentWeather = 'sunny';
+
+function setWeather(weatherType) {
+  currentWeather = weatherType;
+  const weather = WEATHER_TYPES[weatherType];
+  document.body.className = weather.bgClass;
+  
+  // Apply weather effects
+  if (weatherType === 'rainy') {
+    createRainEffect();
+    playSound('rain', 0.3);
+  } else if (weatherType === 'foggy') {
+    createFogEffect();
+  }
+}
+
+function createRainEffect() {
+  const rainContainer = document.createElement('div');
+  rainContainer.id = 'rain-effect';
+  rainContainer.className = 'rain-container';
+  for (let i = 0; i < 100; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'rain-drop';
+    drop.style.left = Math.random() * 100 + '%';
+    drop.style.animationDelay = Math.random() * 2 + 's';
+    drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + 's';
+    rainContainer.appendChild(drop);
+  }
+  document.body.appendChild(rainContainer);
+}
+
+function createFogEffect() {
+  const fogOverlay = document.createElement('div');
+  fogOverlay.id = 'fog-effect';
+  fogOverlay.className = 'fog-overlay';
+  document.body.appendChild(fogOverlay);
+}
+```
+
+**4. Achievement System:**
+```javascript
+// Achievement definitions
+const ACHIEVEMENTS = {
+  first_race: { name: 'First Race', desc: 'Complete your first race', reward: 500, unlocked: false },
+  speed_demon: { name: 'Speed Demon', desc: 'Reach level 10 in a single race', reward: 1000, unlocked: false },
+  collector: { name: 'Collector', desc: 'Collect 1000 coins', reward: 10, rewardType: 'diamond', unlocked: false },
+  survivor: { name: 'Survivor', desc: 'Complete a race without taking damage', reward: 1500, unlocked: false },
+  nitro_master: { name: 'Nitro Master', desc: 'Use nitro 50 times', reward: 800, unlocked: false },
+  garage_king: { name: 'Garage King', desc: 'Own 5 different cars', reward: 15, rewardType: 'diamond', unlocked: false },
+  millionaire: { name: 'Millionaire', desc: 'Earn 100,000 total cash', reward: 50, rewardType: 'diamond', unlocked: false },
+  distance_1k: { name: '1K Warrior', desc: 'Travel 1000km total', reward: 2000, unlocked: false },
+  distance_5k: { name: '5K Legend', desc: 'Travel 5000km total', reward: 30, rewardType: 'diamond', unlocked: false },
+  perfect_game: { name: 'Perfect Game', desc: 'Reach level 20 in a single race', reward: 5000, unlocked: false },
+  gem_hunter: { name: 'Gem Hunter', desc: 'Collect 100 gems', reward: 2500, unlocked: false },
+  lucky_seven: { name: 'Lucky Seven', desc: 'Win 7 races in a row', reward: 20, rewardType: 'diamond', unlocked: false },
+  multiplayer_king: { name: 'Multiplayer King', desc: 'Win 10 multiplayer races', reward: 25, rewardType: 'diamond', unlocked: false },
+  customizer: { name: 'Customizer', desc: 'Customize your first car', reward: 500, unlocked: false },
+  weather_warrior: { name: 'Weather Warrior', desc: 'Race in all weather types', reward: 15, rewardType: 'diamond', unlocked: false },
+  ai_destroyer: { name: 'AI Destroyer', desc: 'Beat AI on Hard difficulty', reward: 30, rewardType: 'diamond', unlocked: false },
+  season_starter: { name: 'Season Starter', desc: 'Reach Season Pass Tier 10', reward: 10, rewardType: 'diamond', unlocked: false },
+  season_master: { name: 'Season Master', desc: 'Complete Season Pass (Tier 50)', reward: 100, rewardType: 'diamond', unlocked: false },
+  daily_grinder: { name: 'Daily Grinder', desc: 'Complete 7 daily challenges', reward: 20, rewardType: 'diamond', unlocked: false },
+  brand_loyalty: { name: 'Brand Loyalty', desc: 'Own all cars from one brand', reward: 40, rewardType: 'diamond', unlocked: false }
+};
+
+function checkAchievement(achievementId) {
+  if (!userData.achievements) userData.achievements = {};
+  if (!userData.achievements[achievementId]) {
+    const achievement = ACHIEVEMENTS[achievementId];
+    userData.achievements[achievementId] = true;
+    showAchievementPopup(achievement);
+    playSound('achievement');
+    
+    // Grant reward
+    if (achievement.rewardType === 'diamond') {
+      userData.diamonds = (userData.diamonds || 0) + achievement.reward;
+    } else {
+      userData.money = (userData.money || 0) + achievement.reward;
+    }
+    saveUserData();
+  }
+}
+
+function showAchievementPopup(achievement) {
+  const popup = document.createElement('div');
+  popup.className = 'achievement-popup';
+  popup.innerHTML = `
+    <div class="achievement-icon">🏆</div>
+    <div class="achievement-content">
+      <h3>Achievement Unlocked!</h3>
+      <p class="achievement-title">${achievement.name}</p>
+      <p class="achievement-desc">${achievement.desc}</p>
+      <p class="achievement-reward">+${achievement.reward} ${achievement.rewardType === 'diamond' ? '💎' : '💰'}</p>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  
+  setTimeout(() => {
+    popup.style.animation = 'slideOutRight 0.5s ease-out';
+    setTimeout(() => popup.remove(), 500);
+  }, 4000);
+}
+```
+
+**5. AI Opponent System:**
+```javascript
+// AI opponent configuration
+let aiEnabled = false;
+let aiDifficulty = 'medium'; // easy, medium, hard
+let aiX = 1; // AI lane position
+let aiY = -200; // AI vertical position
+let aiSpeed = 2;
+let aiLives = 3;
+let aiCash = 0;
+
+const AI_CONFIG = {
+  easy: { reactionTime: 800, mistakeChance: 0.3, speedMult: 0.8 },
+  medium: { reactionTime: 500, mistakeChance: 0.15, speedMult: 1 },
+  hard: { reactionTime: 200, mistakeChance: 0.05, speedMult: 1.2 }
+};
+
+function updateAI(dt) {
+  if (!aiEnabled) return;
+  
+  const config = AI_CONFIG[aiDifficulty];
+  
+  // AI movement logic
+  aiY += aiSpeed * config.speedMult * getDifficultyMultiplier() * dt * 60;
+  
+  // AI lane switching (simple obstacle avoidance)
+  if (Math.random() < 0.02 && Math.random() > config.mistakeChance) {
+    const obstacles = document.querySelectorAll('.cell[data-content="💥"]');
+    let shouldMove = false;
+    let targetLane = aiX;
+    
+    obstacles.forEach(obs => {
+      const obsLane = parseInt(obs.dataset.x);
+      const obsRow = parseInt(obs.dataset.y);
+      if (obsLane === aiX && obsRow < 3) {
+        shouldMove = true;
+        targetLane = aiX === 0 ? 1 : aiX === 2 ? 1 : (Math.random() > 0.5 ? 0 : 2);
+      }
+    });
+    
+    if (shouldMove) {
+      setTimeout(() => { aiX = targetLane; }, config.reactionTime);
+    }
+  }
+  
+  // Random movement (mistakes)
+  if (Math.random() < config.mistakeChance * 0.1) {
+    aiX = Math.max(0, Math.min(2, aiX + (Math.random() > 0.5 ? 1 : -1)));
+  }
+  
+  // Check AI collisions with items
+  checkAICollisions();
+}
+
+function checkAICollisions() {
+  const cells = document.querySelectorAll('.cell');
+  cells.forEach(cell => {
+    const cx = parseInt(cell.dataset.x);
+    const cy = parseInt(cell.dataset.y);
+    const content = cell.dataset.content;
+    
+    if (cx === aiX && cy === 2 && content) {
+      if (content === '💥') {
+        aiLives--;
+        playSound('collision');
+        if (aiLives <= 0) {
+          // AI game over
+          aiEnabled = false;
+        }
+      } else if (content === '💰') {
+        aiCash += 10;
+        cell.dataset.content = '';
+        cell.textContent = '';
+      } else if (content === '💎') {
+        // AI collects gem
+        cell.dataset.content = '';
+        cell.textContent = '';
+      }
+    }
+  });
+}
+
+function renderAI() {
+  if (!aiEnabled) return;
+  
+  // Render AI car on board
+  const cells = document.querySelectorAll('.cell');
+  cells.forEach(cell => {
+    const cx = parseInt(cell.dataset.x);
+    const cy = parseInt(cell.dataset.y);
+    
+    // Remove old AI car
+    if (cell.querySelector('.ai-car')) {
+      cell.querySelector('.ai-car').remove();
+    }
+    
+    // Draw AI car at its position
+    if (cx === aiX && cy === 2) {
+      const aiCar = document.createElement('div');
+      aiCar.className = 'ai-car';
+      aiCar.innerHTML = getCarHTML('saga', 'ai-opponent');
+      cell.appendChild(aiCar);
+    }
+  });
+  
+  // Update AI UI
+  document.getElementById('ai-lives').textContent = aiLives;
+  document.getElementById('ai-cash').textContent = aiCash;
+}
+```
+
+**6. Customization System:**
+```javascript
+// Car customization data
+let carCustomizations = {};
+
+const CUSTOMIZATION_OPTIONS = {
+  colors: [
+    { name: 'Red', value: '#e74c3c', price: 0 },
+    { name: 'Blue', value: '#3498db', price: 500 },
+    { name: 'Green', value: '#2ecc71', price: 500 },
+    { name: 'Yellow', value: '#f1c40f', price: 500 },
+    { name: 'Purple', value: '#9b59b6', price: 500 },
+    { name: 'Orange', value: '#e67e22', price: 500 },
+    { name: 'Pink', value: '#ff69b4', price: 1000 },
+    { name: 'Black', value: '#000000', price: 1000 },
+    { name: 'White', value: '#ffffff', price: 1000 },
+    { name: 'Gold', value: '#ffd700', price: 10, currency: 'diamond' }
+  ],
+  decals: [
+    { name: 'None', value: 'none', price: 0 },
+    { name: 'Racing Stripes', value: 'stripes', price: 2000 },
+    { name: 'Flames', value: 'flames', price: 2500 },
+    { name: 'Stars', value: 'stars', price: 2000 },
+    { name: 'Number', value: 'number', price: 1500 },
+    { name: 'Sponsor', value: 'sponsor', price: 5, currency: 'diamond' }
+  ],
+  rims: [
+    { name: 'Default', value: 'default', price: 0 },
+    { name: 'Sport', value: 'sport', price: 1500 },
+    { name: 'Chrome', value: 'chrome', price: 2000 },
+    { name: 'Gold', value: 'gold', price: 5, currency: 'diamond' }
+  ],
+  underglow: [
+    { name: 'None', value: 'none', price: 0 },
+    { name: 'Blue', value: 'blue', price: 3000 },
+    { name: 'Red', value: 'red', price: 3000 },
+    { name: 'Green', value: 'green', price: 3000 },
+    { name: 'RGB', value: 'rgb', price: 10, currency: 'diamond' }
+  ]
+};
+
+function openCustomization(carKey) {
+  const screen = document.getElementById('customization-screen');
+  screen.classList.remove('hidden');
+  currentCustomizingCar = carKey;
+  
+  // Load existing customization or defaults
+  if (!carCustomizations[carKey]) {
+    carCustomizations[carKey] = {
+      color: '#e74c3c',
+      decal: 'none',
+      rims: 'default',
+      underglow: 'none'
+    };
+  }
+  
+  renderCustomizationOptions();
+}
+
+function applyCustomization(carKey, type, value) {
+  if (!carCustomizations[carKey]) carCustomizations[carKey] = {};
+  carCustomizations[carKey][type] = value;
+  
+  // Save to userData
+  userData.customizations = carCustomizations;
+  saveUserData();
+  
+  // Visual update
+  updateCarVisual(carKey);
+}
+```
+
+**7. Difficulty Settings:**
+```javascript
+// Difficulty system
+let gameDifficulty = 'normal'; // easy, normal, hard, expert
+
+const DIFFICULTY_CONFIG = {
+  easy: {
+    name: 'Mudah',
+    obstacleSpawn: 0.7,
+    healthDropRate: 1.5,
+    speedMult: 0.8,
+    rewardMult: 0.8
+  },
+  normal: {
+    name: 'Normal',
+    obstacleSpawn: 1,
+    healthDropRate: 1,
+    speedMult: 1,
+    rewardMult: 1
+  },
+  hard: {
+    name: 'Susah',
+    obstacleSpawn: 1.3,
+    healthDropRate: 0.7,
+    speedMult: 1.2,
+    rewardMult: 1.5
+  },
+  expert: {
+    name: 'Pakar',
+    obstacleSpawn: 1.5,
+    healthDropRate: 0.5,
+    speedMult: 1.4,
+    rewardMult: 2,
+    minimalUI: true
+  }
+};
+
+function setDifficulty(difficulty) {
+  gameDifficulty = difficulty;
+  const config = DIFFICULTY_CONFIG[difficulty];
+  
+  // Apply difficulty settings
+  if (config.minimalUI) {
+    document.body.classList.add('minimal-ui');
+  } else {
+    document.body.classList.remove('minimal-ui');
+  }
+}
+
+function getDifficultyRewardMultiplier() {
+  return DIFFICULTY_CONFIG[gameDifficulty].rewardMult;
+}
+```
+
+**8. Season Pass System:**
+```javascript
+// Season Pass configuration
+let seasonPassData = {
+  tier: 0,
+  xp: 0,
+  isPremium: false,
+  startDate: Date.now(),
+  claimed: []
+};
+
+const SEASON_TIERS = [];
+for (let i = 0; i < 50; i++) {
+  SEASON_TIERS.push({
+    tier: i + 1,
+    xpRequired: 1000 + (i * 200),
+    freeReward: i % 5 === 0 ? { type: 'diamond', amount: 5 } : { type: 'money', amount: 500 + (i * 100) },
+    premiumReward: i % 10 === 0 ? { type: 'car', carKey: 'exclusive_' + i } : { type: 'customization', item: 'exclusive_decal_' + i }
+  });
+}
+
+function addSeasonXP(amount) {
+  seasonPassData.xp += amount;
+  
+  // Check tier up
+  const currentTier = seasonPassData.tier;
+  const nextTierXP = SEASON_TIERS[currentTier]?.xpRequired || 99999;
+  
+  if (seasonPassData.xp >= nextTierXP && currentTier < 50) {
+    seasonPassData.tier++;
+    seasonPassData.xp -= nextTierXP;
+    showSeasonTierUp(seasonPassData.tier);
+    checkAchievement('season_starter'); // If tier 10
+    if (seasonPassData.tier === 50) checkAchievement('season_master');
+  }
+  
+  saveSeasonPassData();
+}
+
+function showSeasonTierUp(tier) {
+  const popup = document.createElement('div');
+  popup.className = 'season-tierup-popup';
+  popup.innerHTML = `
+    <h2>🎉 SEASON TIER UP! 🎉</h2>
+    <p class="tier-number">TIER ${tier}</p>
+    <p>Check your rewards in Season Pass!</p>
+  `;
+  document.body.appendChild(popup);
+  playSound('levelup');
+  
+  setTimeout(() => popup.remove(), 3000);
+}
+
+function claimSeasonReward(tier, isPremium) {
+  const reward = SEASON_TIERS[tier - 1];
+  if (!reward) return;
+  
+  const rewardData = isPremium ? reward.premiumReward : reward.freeReward;
+  
+  if (rewardData.type === 'money') {
+    userData.money += rewardData.amount;
+  } else if (rewardData.type === 'diamond') {
+    userData.diamonds += rewardData.amount;
+  } else if (rewardData.type === 'car') {
+    userData.ownedCars.push(rewardData.carKey);
+  } else if (rewardData.type === 'customization') {
+    // Unlock customization item
+    if (!userData.unlockedCustomizations) userData.unlockedCustomizations = [];
+    userData.unlockedCustomizations.push(rewardData.item);
+  }
+  
+  seasonPassData.claimed.push(`${tier}-${isPremium ? 'premium' : 'free'}`);
+  saveUserData();
+  saveSeasonPassData();
+}
+```
+
+**9. Tutorial System:**
+```javascript
+// Tutorial system
+let tutorialActive = false;
+let tutorialStep = 0;
+
+const TUTORIAL_STEPS = [
+  {
+    target: '#game-road',
+    title: 'Welcome to Rhythm N Drive!',
+    message: 'Use arrow keys to move your car left and right',
+    highlight: true
+  },
+  {
+    target: '.cell[data-content="💰"]',
+    title: 'Collect Coins',
+    message: 'Drive over coins to earn money',
+    highlight: true
+  },
+  {
+    target: '.cell[data-content="💎"]',
+    title: 'Collect Gems',
+    message: 'Gems give you nitro energy and diamonds',
+    highlight: true
+  },
+  {
+    target: '#nitro-bar',
+    title: 'Nitro Boost',
+    message: 'Press SPACE to activate nitro boost when bar is full',
+    highlight: true
+  },
+  {
+    target: '.cell[data-content="💥"]',
+    title: 'Avoid Obstacles',
+    message: 'Hitting obstacles will damage your car',
+    highlight: true
+  },
+  {
+    target: '#lives',
+    title: 'Health',
+    message: 'Game over when health reaches zero',
+    highlight: false
+  },
+  {
+    target: null,
+    title: 'Ready to Race!',
+    message: 'You\'re all set. Good luck!',
+    highlight: false
+  }
+];
+
+function startTutorial() {
+  tutorialActive = true;
+  tutorialStep = 0;
+  showTutorialStep();
+}
+
+function showTutorialStep() {
+  if (tutorialStep >= TUTORIAL_STEPS.length) {
+    endTutorial();
+    return;
+  }
+  
+  const step = TUTORIAL_STEPS[tutorialStep];
+  const overlay = document.getElementById('tutorial-overlay');
+  const box = document.getElementById('tutorial-box');
+  
+  overlay.classList.remove('hidden');
+  
+  box.innerHTML = `
+    <h2>${step.title}</h2>
+    <p>${step.message}</p>
+    <div class="tutorial-progress">${tutorialStep + 1} / ${TUTORIAL_STEPS.length}</div>
+    <button onclick="nextTutorialStep()" class="menu-btn">
+      ${tutorialStep === TUTORIAL_STEPS.length - 1 ? 'Start Racing!' : 'Next'}
+    </button>
+    <button onclick="skipTutorial()" class="menu-btn btn-danger">Skip</button>
+  `;
+  
+  // Highlight target element
+  if (step.target && step.highlight) {
+    const target = document.querySelector(step.target);
+    if (target) {
+      target.classList.add('tutorial-highlight');
+    }
+  }
+}
+
+function nextTutorialStep() {
+  // Remove previous highlight
+  document.querySelectorAll('.tutorial-highlight').forEach(el => {
+    el.classList.remove('tutorial-highlight');
+  });
+  
+  tutorialStep++;
+  showTutorialStep();
+}
+
+function skipTutorial() {
+  endTutorial();
+}
+
+function endTutorial() {
+  tutorialActive = false;
+  document.getElementById('tutorial-overlay').classList.add('hidden');
+  document.querySelectorAll('.tutorial-highlight').forEach(el => {
+    el.classList.remove('tutorial-highlight');
+  });
+  
+  // Mark tutorial as completed
+  userData.tutorialCompleted = true;
+  saveUserData();
+}
+```
+
+**10. Visual Feedback Enhancements:**
+```javascript
+// Particle system for effects
+function createParticles(x, y, color, count = 10) {
+  for (let i = 0; i < count; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+    particle.style.background = color;
+    
+    const angle = (Math.PI * 2 * i) / count;
+    const velocity = 2 + Math.random() * 3;
+    const vx = Math.cos(angle) * velocity;
+    const vy = Math.sin(angle) * velocity;
+    
+    particle.style.setProperty('--vx', vx + 'px');
+    particle.style.setProperty('--vy', vy + 'px');
+    
+    document.body.appendChild(particle);
+    
+    setTimeout(() => particle.remove(), 1000);
+  }
+}
+
+function screenShake(intensity = 10, duration = 200) {
+  document.body.style.animation = `shake ${duration}ms ease-in-out`;
+  setTimeout(() => {
+    document.body.style.animation = '';
+  }, duration);
+}
+
+function createSpeedLines() {
+  const container = document.getElementById('speed-lines');
+  if (!container) {
+    const newContainer = document.createElement('div');
+    newContainer.id = 'speed-lines';
+    newContainer.className = 'speed-lines-container';
+    document.getElementById('game-container').appendChild(newContainer);
+  }
+  
+  for (let i = 0; i < 20; i++) {
+    const line = document.createElement('div');
+    line.className = 'speed-line';
+    line.style.left = Math.random() * 100 + '%';
+    line.style.animationDelay = Math.random() * 1 + 's';
+    document.getElementById('speed-lines').appendChild(line);
+  }
+}
+
+function removeSpeedLines() {
+  const container = document.getElementById('speed-lines');
+  if (container) container.remove();
+}
+
+// Enhance existing collision to add effects
+function enhanceCollisionEffects() {
+  // This wraps existing collision logic
+  screenShake(15, 300);
+  createParticles(x * 100 + 50, 250, '#e74c3c', 15);
+  playSound('collision', 0.8);
+  
+  // Add smoke effect to car
+  document.querySelector('.car-visual').classList.add('damage-smoke');
+  setTimeout(() => {
+    document.querySelector('.car-visual')?.classList.remove('damage-smoke');
+  }, 2000);
+}
+```
+
+---
+
+### File: `style.css` - New Additions (Append to existing styles)
+
+```css
+/* ========================================
+   NEW CAR VISUALS
+======================================== */
+
+/* PERODUA Axia */
+.v-axia {
+  width: 65px;
+  height: 95px;
+  background: linear-gradient(180deg, #c0392b, #e74c3c);
+  border: 3px solid #fff;
+  border-radius: 10px 10px 18px 18px;
+  position: relative;
+}
+
+.v-axia-roof {
+  width: 55px;
+  height: 35px;
+  background: #1a1a1a;
+  border-radius: 6px 6px 0 0;
+  position: absolute;
+  top: 12px;
+  left: 5px;
+}
+
+/* PERODUA Bezza */
+.v-bezza {
+  width: 68px;
+  height: 98px;
+  background: linear-gradient(180deg, #2980b9, #3498db);
+  border: 3px solid #fff;
+  border-radius: 12px 12px 20px 20px;
+  position: relative;
+}
+
+.v-bezza-roof {
+  width: 58px;
+  height: 38px;
+  background: #0a0a0a;
+  border-radius: 8px 8px 0 0;
+  position: absolute;
+  top: 14px;
+  left: 5px;
+}
+
+/* PERODUA Aruz */
+.v-aruz {
+  width: 75px;
+  height: 105px;
+  background: linear-gradient(180deg, #16a085, #1abc9c);
+  border: 3px solid #fff;
+  border-radius: 15px 15px 22px 22px;
+  position: relative;
+}
+
+.v-aruz-roof {
+  width: 65px;
+  height: 50px;
+  background: #1a1a1a;
+  border-radius: 10px 10px 0 0;
+  position: absolute;
+  top: 15px;
+  left: 5px;
+}
+
+/* PERODUA Alza */
+.v-alza {
+  width: 72px;
+  height: 102px;
+  background: linear-gradient(180deg, #7f8c8d, #95a5a6);
+  border: 3px solid #fff;
+  border-radius: 14px 14px 20px 20px;
+  position: relative;
+}
+
+.v-alza-roof {
+  width: 62px;
+  height: 45px;
+  background: #2c3e50;
+  border-radius: 8px 8px 0 0;
+  position: absolute;
+  top: 14px;
+  left: 5px;
+}
+
+/* PROTON X50 */
+.v-x50 {
+  width: 75px;
+  height: 105px;
+  background: linear-gradient(180deg, #8e44ad, #9b59b6);
+  border: 3px solid #fff;
+  border-radius: 16px 16px 24px 24px;
+  position: relative;
+  box-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+}
+
+.v-x50-roof {
+  width: 65px;
+  height: 48px;
+  background: #0a0a0a;
+  border-radius: 10px 10px 0 0;
+  position: absolute;
+  top: 16px;
+  left: 5px;
+}
+
+.v-x50-spoiler {
+  width: 78px;
+  height: 6px;
+  background: #6c3483;
+  position: absolute;
+  bottom: 5px;
+  left: -1px;
+}
+
+/* PROTON X70 */
+.v-x70 {
+  width: 78px;
+  height: 108px;
+  background: linear-gradient(180deg, #2c3e50, #34495e);
+  border: 3px solid #fff;
+  border-radius: 18px 18px 26px 26px;
+  position: relative;
+}
+
+.v-x70-roof {
+  width: 68px;
+  height: 52px;
+  background: #1a1a1a;
+  border-radius: 12px 12px 0 0;
+  position: absolute;
+  top: 18px;
+  left: 5px;
+}
+
+/* PROTON Persona */
+.v-persona {
+  width: 70px;
+  height: 100px;
+  background: linear-gradient(180deg, #d35400, #e67e22);
+  border: 3px solid #fff;
+  border-radius: 13px 13px 20px 20px;
+  position: relative;
+}
+
+.v-persona-roof {
+  width: 60px;
+  height: 40px;
+  background: #0a0a0a;
+  border-radius: 8px 8px 0 0;
+  position: absolute;
+  top: 14px;
+  left: 5px;
+}
+
+/* PROTON Iriz */
+.v-iriz {
+  width: 68px;
+  height: 96px;
+  background: linear-gradient(180deg, #c0392b, #e74c3c);
+  border: 3px solid #fff;
+  border-radius: 12px 12px 19px 19px;
+  position: relative;
+}
+
+.v-iriz-roof {
+  width: 58px;
+  height: 37px;
+  background: #2c3e50;
+  border-radius: 7px 7px 0 0;
+  position: absolute;
+  top: 13px;
+  left: 5px;
+}
+
+/* TOYOTA Vios */
+.v-vios {
+  width: 70px;
+  height: 100px;
+  background: linear-gradient(180deg, #bdc3c7, #ecf0f1);
+  border: 3px solid #fff;
+  border-radius: 12px 12px 20px 20px;
+  position: relative;
+}
+
+.v-vios-roof {
+  width: 60px;
+  height: 40px;
+  background: #34495e;
+  border-radius: 8px 8px 0 0;
+  position: absolute;
+  top: 15px;
+  left: 5px;
+}
+
+/* TOYOTA Camry */
+.v-camry {
+  width: 75px;
+  height: 105px;
+  background: linear-gradient(180deg, #1a1a1a, #2c3e50);
+  border: 3px solid #fff;
+  border-radius: 15px 15px 22px 22px;
+  position: relative;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+}
+
+.v-camry-roof {
+  width: 65px;
+  height: 45px;
+  background: #0a0a0a;
+  border-radius: 10px 10px 0 0;
+  position: absolute;
+  top: 16px;
+  left: 5px;
+}
+
+/* TOYOTA Supra */
+.v-supra {
+  width: 78px;
+  height: 108px;
+  background: linear-gradient(180deg, #e74c3c, #c0392b);
+  border: 4px solid #f1c40f;
+  border-radius: 18px 18px 28px 28px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.8);
+}
+
+.v-supra-roof {
+  width: 68px;
+  height: 35px;
+  background: #0a0a0a;
+  border-radius: 12px 12px 0 0;
+  position: absolute;
+  top: 20px;
+  left: 5px;
+}
+
+.v-supra-spoiler {
+  width: 82px;
+  height: 12px;
+  background: #f1c40f;
+  position: absolute;
+  bottom: 8px;
+  left: -2px;
+  box-shadow: 0 0 15px rgba(241, 196, 15, 0.8);
+}
+
+/* HONDA Civic */
+.v-civic {
+  width: 75px;
+  height: 105px;
+  background: linear-gradient(180deg, #16a085, #1abc9c);
+  border: 3px solid #fff;
+  border-radius: 15px 15px 25px 25px;
+  position: relative;
+}
+
+.v-civic-roof {
+  width: 65px;
+  height: 45px;
+  background: #0a0a0a;
+  border-radius: 10px 10px 0 0;
+  position: absolute;
+  top: 18px;
+  left: 5px;
+}
+
+.v-civic-spoiler {
+  width: 80px;
+  height: 8px;
+  background: #148f77;
+  position: absolute;
+  bottom: 5px;
+  left: -2px;
+}
+
+/* HONDA City */
+.v-city {
+  width: 68px;
+  height: 98px;
+  background: linear-gradient(180deg, #f39c12, #f1c40f);
+  border: 3px solid #fff;
+  border-radius: 12px 12px 20px 20px;
+  position: relative;
+}
+
+.v-city-roof {
+  width: 58px;
+  height: 38px;
+  background: #2c3e50;
+  border-radius: 8px 8px 0 0;
+  position: absolute;
+  top: 14px;
+  left: 5px;
+}
+
+/* HONDA NSX */
+.v-nsx {
+  width: 80px;
+  height: 110px;
+  background: linear-gradient(180deg, #8e44ad, #9b59b6);
+  border: 4px solid #f1c40f;
+  border-radius: 20px 20px 30px 30px;
+  position: relative;
+  box-shadow: 0 0 25px rgba(155, 89, 182, 0.9);
+}
+
+.v-nsx-roof {
+  width: 70px;
+  height: 30px;
+  background: #0a0a0a;
+  border-radius: 14px 14px 0 0;
+  position: absolute;
+  top: 22px;
+  left: 5px;
+}
+
+.v-nsx-spoiler {
+  width: 84px;
+  height: 14px;
+  background: #f1c40f;
+  position: absolute;
+  bottom: 10px;
+  left: -2px;
+  box-shadow: 0 0 18px rgba(241, 196, 15, 0.9);
+}
+
+/* NISSAN GTR */
+.v-gtr {
+  width: 80px;
+  height: 110px;
+  background: linear-gradient(180deg, #2c3e50, #34495e);
+  border: 4px solid #e74c3c;
+  border-radius: 18px 18px 30px 30px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.7);
+}
+
+.v-gtr-roof {
+  width: 70px;
+  height: 50px;
+  background: #0a0a0a;
+  border-radius: 12px 12px 0 0;
+  position: absolute;
+  top: 20px;
+  left: 5px;
+}
+
+.v-gtr-spoiler {
+  width: 85px;
+  height: 12px;
+  background: #e74c3c;
+  position: absolute;
+  bottom: 8px;
+  left: -2px;
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.8);
+}
+
+/* NISSAN Skyline */
+.v-skyline {
+  width: 78px;
+  height: 108px;
+  background: linear-gradient(180deg, #3498db, #2980b9);
+  border: 4px solid #f1c40f;
+  border-radius: 16px 16px 28px 28px;
+  position: relative;
+  box-shadow: 0 0 18px rgba(52, 152, 219, 0.7);
+}
+
+.v-skyline-roof {
+  width: 68px;
+  height: 48px;
+  background: #0a0a0a;
+  border-radius: 10px 10px 0 0;
+  position: absolute;
+  top: 18px;
+  left: 5px;
+}
+
+.v-skyline-spoiler {
+  width: 82px;
+  height: 10px;
+  background: #f1c40f;
+  position: absolute;
+  bottom: 7px;
+  left: -2px;
+}
+
+/* BMW M3 */
+.v-m3 {
+  width: 78px;
+  height: 108px;
+  background: linear-gradient(180deg, #ecf0f1, #bdc3c7);
+  border: 4px solid #3498db;
+  border-radius: 16px 16px 28px 28px;
+  position: relative;
+  box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+}
+
+.v-m3-roof {
+  width: 68px;
+  height: 45px;
+  background: #2c3e50;
+  border-radius: 10px 10px 0 0;
+  position: absolute;
+  top: 18px;
+  left: 5px;
+}
+
+.v-m3-spoiler {
+  width: 82px;
+  height: 8px;
+  background: #3498db;
+  position: absolute;
+  bottom: 6px;
+  left: -2px;
+}
+
+/* BMW M5 */
+.v-m5 {
+  width: 80px;
+  height: 110px;
+  background: linear-gradient(180deg, #1a1a1a, #2c2c2c);
+  border: 4px solid #e74c3c;
+  border-radius: 18px 18px 30px 30px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.7);
+}
+
+.v-m5-roof {
+  width: 70px;
+  height: 48px;
+  background: #0a0a0a;
+  border-radius: 12px 12px 0 0;
+  position: absolute;
+  top: 20px;
+  left: 5px;
+}
+
+.v-m5-spoiler {
+  width: 84px;
+  height: 10px;
+  background: #e74c3c;
+  position: absolute;
+  bottom: 8px;
+  left: -2px;
+}
+
+/* ========================================
+   WEATHER EFFECTS
+======================================== */
+
+.weather-sunny {
+  background: linear-gradient(180deg, #3498db, #87ceeb);
+}
+
+.weather-rainy {
+  background: linear-gradient(180deg, #34495e, #2c3e50);
+}
+
+.weather-foggy {
+  background: linear-gradient(180deg, #95a5a6, #7f8c8d);
+}
+
+.weather-night {
+  background: linear-gradient(180deg, #0a0a0a, #1a1a2e);
+}
+
+.rain-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.rain-drop {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(180deg, transparent, rgba(174, 214, 241, 0.8));
+  animation: rain-fall linear infinite;
+}
+
+@keyframes rain-fall {
+  0% { top: -20px; opacity: 1; }
+  100% { top: 100vh; opacity: 0.3; }
+}
+
+.fog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(149, 165, 166, 0.4);
+  pointer-events: none;
+  z-index: 9998;
+  animation: fog-drift 10s ease-in-out infinite alternate;
+}
+
+@keyframes fog-drift {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.6; }
+}
+
+/* ========================================
+   VISUAL FEEDBACK EFFECTS
+======================================== */
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  animation: particle-burst 1s ease-out forwards;
+}
+
+@keyframes particle-burst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--vx, 0), var(--vy, 0)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.speed-lines-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.speed-line {
+  position: absolute;
+  width: 2px;
+  height: 50px;
+  background: linear-gradient(180deg, transparent, rgba(241, 196, 15, 0.6), transparent);
+  animation: speed-line-move 0.5s linear infinite;
+}
+
+@keyframes speed-line-move {
+  0% { top: -50px; }
+  100% { top: 100%; }
+}
+
+.damage-smoke {
+  position: relative;
+}
+
+.damage-smoke::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle, rgba(149, 165, 166, 0.6), transparent);
+  animation: smoke-rise 1s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes smoke-rise {
+  0% {
+    top: 0;
+    opacity: 0.8;
+    transform: translateX(-50%) scale(0.5);
+  }
+  100% {
+    top: -40px;
+    opacity: 0;
+    transform: translateX(-50%) scale(1.5);
+  }
+}
+
+.tutorial-highlight {
+  position: relative;
+  z-index: 10001;
+  box-shadow: 0 0 0 4px var(--primary), 0 0 20px var(--primary);
+  animation: tutorial-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes tutorial-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--primary), 0 0 20px var(--primary); }
+  50% { box-shadow: 0 0 0 8px var(--primary), 0 0 30px var(--primary); }
+}
+
+/* ========================================
+   AI OPPONENT STYLING
+======================================== */
+
+.ai-car {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+  filter: hue-rotate(180deg);
+}
+
+.ai-opponent {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.7);
+}
+
+/* ========================================
+   ACHIEVEMENT POPUP
+======================================== */
+
+.achievement-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 350px;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  border: 3px solid var(--primary);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  animation: slideInRight 0.5s ease-out;
+  z-index: 10002;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+.achievement-icon {
+  font-size: 3em;
+  animation: achievement-bounce 0.6s ease-out;
+}
+
+@keyframes achievement-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.achievement-content {
+  flex: 1;
+}
+
+.achievement-content h3 {
+  margin: 0 0 5px 0;
+  color: var(--primary);
+  font-size: 0.9em;
+  text-transform: uppercase;
+}
+
+.achievement-title {
+  margin: 0 0 5px 0;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #fff;
+}
+
+.achievement-desc {
+  margin: 0 0 8px 0;
+  font-size: 0.85em;
+  color: #bdc3c7;
+}
+
+.achievement-reward {
+  margin: 0;
+  font-size: 1em;
+  color: var(--success);
+  font-weight: bold;
+}
+
+/* ========================================
+   CUSTOMIZATION SCREEN
+======================================== */
+
+#customization-screen {
+  background: rgba(0,0,0,0.95);
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.customization-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.customization-preview {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 40px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  border: 2px solid var(--primary);
+}
+
+.customization-preview .car-visual {
+  transform: scale(2);
+  margin: 50px auto;
+}
+
+.customization-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.option-group {
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.option-group h3 {
+  color: var(--primary);
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  font-size: 1em;
+}
+
+.option-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.option-item:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--primary);
+}
+
+.option-item.selected {
+  background: rgba(241, 196, 15, 0.2);
+  border-color: var(--primary);
+}
+
+.option-color-preview {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+/* ========================================
+   SEASON PASS SCREEN
+======================================== */
+
+#season-pass-screen {
+  background: rgba(0,0,0,0.95);
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+
+.season-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.season-header h1 {
+  color: var(--primary);
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  text-shadow: 0 0 20px var(--primary);
+}
+
+.season-info {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.season-stat {
+  text-align: center;
+}
+
+.season-stat-value {
+  font-size: 2em;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.season-stat-label {
+  font-size: 0.9em;
+  color: #95a5a6;
+  text-transform: uppercase;
+}
+
+.season-progress-bar {
+  width: 80%;
+  height: 30px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  margin: 0 auto 30px auto;
+  overflow: hidden;
+  border: 2px solid var(--primary);
+}
+
+.season-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  transition: width 0.5s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  font-weight: bold;
+}
+
+.season-tiers {
+  display: grid;
+  grid-template-columns: 50px 1fr 1fr;
+  gap: 2px;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.1);
+  padding: 2px;
+  border-radius: 8px;
+}
+
+.tier-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.05);
+  padding: 15px 5px;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.tier-reward {
+  background: rgba(255,255,255,0.03);
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.tier-reward.premium {
+  background: linear-gradient(90deg, rgba(155, 89, 182, 0.2), rgba(155, 89, 182, 0.05));
+}
+
+.tier-reward.unlocked {
+  border-color: var(--success);
+}
+
+.tier-reward.claimed {
+  opacity: 0.5;
+}
+
+.tier-reward:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.reward-icon {
+  font-size: 2em;
+}
+
+.reward-info {
+  flex: 1;
+  margin: 0 15px;
+}
+
+.reward-name {
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+
+.reward-desc {
+  font-size: 0.85em;
+  color: #95a5a6;
+}
+
+.claim-btn {
+  padding: 8px 16px;
+  background: var(--primary);
+  border: none;
+  border-radius: 6px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.claim-btn:hover {
+  background: var(--success);
+  transform: scale(1.05);
+}
+
+.claim-btn:disabled {
+  background: #7f8c8d;
+  cursor: not-allowed;
+  transform: scale(1);
+}
+
+.season-tierup-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #8e44ad, #9b59b6);
+  border: 4px solid var(--primary);
+  border-radius: 20px;
+  padding: 50px;
+  text-align: center;
+  z-index: 10003;
+  animation: tier-popup 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+}
+
+@keyframes tier-popup {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.season-tierup-popup h2 {
+  color: var(--primary);
+  font-size: 2em;
+  margin: 0 0 20px 0;
+  text-shadow: 0 0 20px var(--primary);
+}
+
+.season-tierup-popup .tier-number {
+  font-size: 4em;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 0 0 30px rgba(255,255,255,0.8);
+  margin: 20px 0;
+}
+
+/* ========================================
+   TUTORIAL OVERLAY
+======================================== */
+
+#tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#tutorial-box {
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  border: 3px solid var(--primary);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  animation: tutorial-bounce 0.5s ease-out;
+}
+
+@keyframes tutorial-bounce {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#tutorial-box h2 {
+  color: var(--primary);
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.8em;
+}
+
+#tutorial-box p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  color: #ecf0f1;
+}
+
+.tutorial-progress {
+  color: #95a5a6;
+  font-size: 0.9em;
+  margin-bottom: 20px;
+}
+
+#tutorial-box .menu-btn {
+  margin: 5px 10px;
+}
+
+/* ========================================
+   LOADING INDICATORS
+======================================== */
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10004;
+}
+
+.loading-logo {
+  font-size: 4em;
+  font-weight: bold;
+  color: var(--primary);
+  text-shadow: 0 0 30px var(--primary);
+  margin-bottom: 40px;
+  animation: logo-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes logo-glow {
+  0% { text-shadow: 0 0 20px var(--primary); }
+  100% { text-shadow: 0 0 40px var(--primary), 0 0 60px var(--primary); }
+}
+
+.loading-bar {
+  width: 400px;
+  height: 20px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--primary);
+  margin-bottom: 20px;
+}
+
+.loading-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  width: 0%;
+  transition: width 0.3s ease-out;
+  box-shadow: 0 0 20px var(--primary);
+}
+
+.loading-percentage {
+  font-size: 1.5em;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.loading-tip {
+  margin-top: 30px;
+  font-size: 1em;
+  color: #95a5a6;
+  max-width: 400px;
+  text-align: center;
+  animation: fade-in-out 3s ease-in-out infinite;
+}
+
+@keyframes fade-in-out {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ========================================
+   DIFFICULTY SELECTOR
+======================================== */
+
+.difficulty-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.difficulty-card {
+  background: rgba(255,255,255,0.05);
+  border: 3px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.difficulty-card:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: var(--primary);
+  transform: translateY(-5px);
+}
+
+.difficulty-card.selected {
+  background: rgba(241, 196, 15, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 20px var(--primary);
+}
+
+.difficulty-card h3 {
+  color: var(--primary);
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.5em;
+}
+
+.difficulty-card p {
+  font-size: 0.9em;
+  color: #bdc3c7;
+  margin-bottom: 10px;
+}
+
+.difficulty-multiplier {
+  font-size: 1.2em;
+  color: var(--success);
+  font-weight: bold;
+}
+
+/* ========================================
+   RESPONSIVE & UTILITIES
+======================================== */
+
+.minimal-ui .stats-bar,
+.minimal-ui #level-display {
+  opacity: 0.3;
+  transition: opacity 0.3s;
+}
+
+.minimal-ui .stats-bar:hover,
+.minimal-ui #level-display:hover {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .achievement-popup {
+    width: 90%;
+    right: 5%;
+  }
+  
+  .season-tiers {
+    grid-template-columns: 40px 1fr;
+  }
+  
+  .tier-reward.premium {
+    grid-column: 2;
+  }
+  
+  #tutorial-box {
+    padding: 25px;
+    max-width: 90%;
+  }
+  
+  .difficulty-selector {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+---
+
+### File: `index.html` - New Additions (Append before closing `</body>`)
+
+```html
+<!-- TUTORIAL OVERLAY -->
+<div id="tutorial-overlay" class="hidden">
+  <div id="tutorial-box"></div>
+</div>
+
+<!-- CUSTOMIZATION SCREEN -->
+<div id="customization-screen" class="hidden">
+  <div class="customization-container">
+    <h1>🎨 CAR CUSTOMIZATION</h1>
+    
+    <div class="customization-preview">
+      <h2 id="customizing-car-name">KANCIL</h2>
+      <div id="customization-car-preview"></div>
+    </div>
+    
+    <div class="customization-options">
+      <div class="option-group">
+        <h3>🎨 Colors</h3>
+        <div id="color-options"></div>
+      </div>
+      
+      <div class="option-group">
+        <h3>🎭 Decals</h3>
+        <div id="decal-options"></div>
+      </div>
+      
+      <div class="option-group">
+        <h3>⚙️ Rims</h3>
+        <div id="rim-options"></div>
+      </div>
+      
+      <div class="option-group">
+        <h3>💡 Underglow</h3>
+        <div id="underglow-options"></div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+      <button class="menu-btn" onclick="saveCustomization()">💾 SAVE</button>
+      <button class="menu-btn btn-danger" onclick="closeCustomization()">❌ CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEASON PASS SCREEN -->
+<div id="season-pass-screen" class="hidden">
+  <div class="season-header">
+    <h1>🎖️ SEASON PASS</h1>
+    <p>Season 1: Street Legends</p>
+    
+    <div class="season-info">
+      <div class="season-stat">
+        <div class="season-stat-value" id="season-tier">1</div>
+        <div class="season-stat-label">Current Tier</div>
+      </div>
+      <div class="season-stat">
+        <div class="season-stat-value" id="season-xp">0</div>
+        <div class="season-stat-label">XP</div>
+      </div>
+      <div class="season-stat">
+        <div class="season-stat-value" id="season-days-left">30</div>
+        <div class="season-stat-label">Days Left</div>
+      </div>
+    </div>
+    
+    <div class="season-progress-bar">
+      <div class="season-progress-fill" id="season-progress" style="width: 0%;">0%</div>
+    </div>
+  </div>
+  
+  <div class="season-tiers" id="season-tiers-container">
+    <!-- Tiers will be generated by JavaScript -->
+  </div>
+  
+  <div style="text-align: center; margin-top: 30px;">
+    <button class="menu-btn" onclick="buySeasonPassPremium()">💎 UNLOCK PREMIUM (50 Diamonds)</button>
+    <button class="menu-btn btn-danger" onclick="closeSeasonPass()">❌ CLOSE</button>
+  </div>
+</div>
+
+<!-- ACHIEVEMENT SCREEN -->
+<div id="achievement-screen" class="hidden">
+  <div style="max-width: 1000px; margin: 0 auto; padding: 40px;">
+    <h1 style="text-align: center; color: var(--primary); margin-bottom: 30px;">🏆 ACHIEVEMENTS</h1>
+    
+    <div id="achievements-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;"></div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+      <button class="menu-btn btn-danger" onclick="closeAchievements()">❌ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- DIFFICULTY SELECT SCREEN -->
+<div id="difficulty-screen" class="hidden">
+  <div style="max-width: 900px; margin: 0 auto; padding: 40px; text-align: center;">
+    <h1 style="color: var(--primary); margin-bottom: 20px;">⚙️ SELECT DIFFICULTY</h1>
+    <p style="color: #95a5a6; margin-bottom: 30px;">Choose your challenge level. Higher difficulty = Higher rewards!</p>
+    
+    <div class="difficulty-selector">
+      <div class="difficulty-card" onclick="selectDifficulty('easy')">
+        <h3>😊 MUDAH</h3>
+        <p>Slower obstacles, more health drops</p>
+        <p class="difficulty-multiplier">Rewards: x0.8</p>
+      </div>
+      
+      <div class="difficulty-card selected" onclick="selectDifficulty('normal')">
+        <h3>😐 NORMAL</h3>
+        <p>Balanced gameplay experience</p>
+        <p class="difficulty-multiplier">Rewards: x1.0</p>
+      </div>
+      
+      <div class="difficulty-card" onclick="selectDifficulty('hard')">
+        <h3>😤 SUSAH</h3>
+        <p>Faster obstacles, fewer power-ups</p>
+        <p class="difficulty-multiplier">Rewards: x1.5</p>
+      </div>
+      
+      <div class="difficulty-card" onclick="selectDifficulty('expert')">
+        <h3>💀 PAKAR</h3>
+        <p>Maximum challenge, minimal UI</p>
+        <p class="difficulty-multiplier">Rewards: x2.0</p>
+      </div>
+    </div>
+    
+    <div style="margin-top: 30px;">
+      <button class="menu-btn" onclick="confirmDifficulty()">✅ CONFIRM</button>
+      <button class="menu-btn btn-danger" onclick="closeDifficultyScreen()">❌ CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- WEATHER SELECTOR (add to map select screen) -->
+<div id="weather-selector" style="margin: 20px 0; text-align: center;">
+  <h3 style="color: var(--primary);">🌤️ WEATHER</h3>
+  <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+    <button class="menu-btn" onclick="selectWeather('sunny')">☀️ Cerah</button>
+    <button class="menu-btn" onclick="selectWeather('rainy')">🌧️ Hujan</button>
+    <button class="menu-btn" onclick="selectWeather('foggy')">🌫️ Kabus</button>
+    <button class="menu-btn" onclick="selectWeather('night')">🌙 Malam</button>
+  </div>
+</div>
+
+<!-- AI OPPONENT SELECTOR (add to map select screen) -->
+<div id="ai-selector" style="margin: 20px 0; text-align: center;">
+  <h3 style="color: var(--primary);">🤖 AI OPPONENT</h3>
+  <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+    <button class="menu-btn" onclick="toggleAI()">
+      <span id="ai-toggle-text">Enable AI</span>
+    </button>
+  </div>
+  <div id="ai-difficulty-selector" class="hidden">
+    <p>Select AI Difficulty:</p>
+    <button class="menu-btn" onclick="setAIDifficulty('easy')">😊 Easy</button>
+    <button class="menu-btn" onclick="setAIDifficulty('medium')">😐 Medium</button>
+    <button class="menu-btn" onclick="setAIDifficulty('hard')">😤 Hard</button>
+  </div>
+</div>
+
+<!-- AI STATS (add to game-container) -->
+<div id="ai-stats" class="stats-bar" style="position: absolute; top: 10px; right: 10px; display: none;">
+  <h3 style="color: #e74c3c;">🤖 AI OPPONENT</h3>
+  <p>Lives: <span id="ai-lives">3</span></p>
+  <p>Cash: <span id="ai-cash">0</span></p>
+</div>
+
+<!-- LOADING SCREEN -->
+<div id="loading-screen" class="loading-screen hidden">
+  <div class="loading-logo">RnD</div>
+  <div class="loading-bar">
+    <div class="loading-bar-fill" id="loading-bar-fill"></div>
+  </div>
+  <div class="loading-percentage" id="loading-percentage">0%</div>
+  <div class="loading-tip" id="loading-tip">Loading assets...</div>
+</div>
+
+<!-- Add to main menu buttons -->
+<script>
+  // Add new menu buttons after existing ones
+  const mainMenuButtons = document.querySelector('#main-menu .menu-btn-row');
+  
+  // Season Pass button
+  const seasonBtn = document.createElement('button');
+  seasonBtn.className = 'menu-btn btn-special';
+  seasonBtn.textContent = '🎖️ SEASON PASS';
+  seasonBtn.onclick = openSeasonPass;
+  mainMenuButtons.appendChild(seasonBtn);
+  
+  // Achievement button
+  const achievementBtn = document.createElement('button');
+  achievementBtn.className = 'menu-btn';
+  achievementBtn.textContent = '🏆 ACHIEVEMENTS';
+  achievementBtn.onclick = openAchievements;
+  mainMenuButtons.appendChild(achievementBtn);
+  
+  // Difficulty button
+  const difficultyBtn = document.createElement('button');
+  difficultyBtn.className = 'menu-btn';
+  difficultyBtn.textContent = '⚙️ DIFFICULTY';
+  difficultyBtn.onclick = openDifficultyScreen;
+  mainMenuButtons.appendChild(difficultyBtn);
+</script>
+```
+
+---
+
+## Sound Files Required
+
+Create `/sounds/` folder dengan files berikut:
+- `engine.mp3` - Engine sound
+- `collision.mp3` - Crash sound
+- `nitro_on.mp3` - Nitro activation
+- `nitro_off.mp3` - Nitro deactivation
+- `coin.mp3` - Coin collection
+- `gem.mp3` - Gem collection
+- `health.mp3` - Health pickup
+- `levelup.mp3` - Level up sound
+- `achievement.mp3` - Achievement unlock
+- `click.mp3` - Button click
+- `hover.mp3` - Button hover
+- `rain.mp3` - Rain ambient (loop)
+- `wind.mp3` - Wind ambient (loop)
+
+---
+
+## Integration Notes
+
+### Integrating with Existing Code:
+
+1. **Kereta Baru**: Tambah dalam existing `CARS` object, jangan replace
+2. **Sound System**: Panggil `playSound()` dalam existing functions:
+   - Collision: `enhanceCollisionEffects()` dalam collision check
+   - Coin collect: `playSound('coin')` bila collect coin
+   - Nitro: `playSound('nitro_on')` bila activate nitro
+   
+3. **Weather System**: Panggil `setWeather()` sebelum start race
+4. **AI System**: Panggil `updateAI(dt)` dan `renderAI()` dalam existing `gameLoop`
+5. **Achievement Checks**: Tambah `checkAchievement()` calls dalam:
+   - End of race: `checkAchievement('first_race')`
+   - Level milestones: `checkAchievement('speed_demon')` bila level 10
+   - Collection milestones: Check coin/gem counts
+   
+6. **Season XP**: Panggil `addSeasonXP()` selepas setiap race
+7. **Tutorial**: Panggil `startTutorial()` untuk first-time players
+
+---
+
+## Testing Checklist
+
+- [ ] Semua 18 kereta baru render dengan betul
+- [ ] Sound effects play pada events yang sesuai
+- [ ] Weather effects visual dan gameplay impact berfungsi
+- [ ] AI opponent bergerak dan respond kepada obstacles
+- [ ] Achievement unlock dan popup display
+- [ ] Customization save dan apply ke kereta
+- [ ] Season pass XP accumulate dan tier up
+- [ ] Tutorial flow complete dan skippable
+- [ ] Difficulty settings affect gameplay
+- [ ] Loading screen show semasa asset loading
+
+---
+
+## Assumptions
+
+- Sound files akan disediakan atau diganti dengan placeholder
+- Existing localStorage structure maintained
+- Game loop timing (60 FPS) maintained
+- Existing control scheme tidak diubah
+- Mobile responsiveness menggunakan existing CSS media queries
+
+---
+
+## Open Questions
+
+1. Adakah anda perlukan sound files atau placeholder?
+2. Season Pass perlu backend sync atau local only?
+3. Multiplayer tetap local-only atau perlu online?
+4. Car customization perlu cost money/diamonds?
